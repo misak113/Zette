@@ -26,6 +26,9 @@ class ZetteExtension extends CompilerExtension
 				->setClass('Zette\UI\ComponentDispatcher');
 		$container->addDefinition('zette.connectionPanel')
 				->setClass('Zette\Database\Diagnostics\ConnectionPanel');
+		$container->addDefinition('zette.classCache')
+				->setClass('Zette\Caching\ClassCache')
+				->addTag('inject');
 		$container->getDefinition('nette.userStorage')
 				->setClass('Zette\Security\UserStorage');
 		$container->addDefinition('zette.routingPanel')
@@ -40,6 +43,10 @@ class ZetteExtension extends CompilerExtension
 				->addSetup('Nette\Diagnostics\Debugger::$bar->addPanel(?)', array(
 					new \Nette\DI\Statement('Zette\Security\Diagnostics\UserPanel')
 				));
+		$container->addDefinition('zette.exceptionLogPanel')
+				->setClass('Zette\Diagnostics\ExceptionLogPanel')
+				->addSetup('\Nette\Diagnostics\Debugger::$bar->addPanel($service);?', array('')) // @todo proč nejde normálně bez ?
+				->addTag('run');
 
 	}
 
@@ -68,6 +75,7 @@ class ZetteExtension extends CompilerExtension
 				$classReflection = \Nette\Reflection\ClassType::from($class);
 				if ($classReflection->isSubclassOf('\Zend_Db_Table_Abstract')) {
 					$def->addSetup('$this->getService(?)->trySetTableDependencies($service);', array($this->prefix('injector')));
+					$def->addSetup('$this->getService(?)->tryInject($service);', array($this->prefix('injector')));
 				}
 			} catch (\ReflectionException $e) {
 				_dBar($e);
