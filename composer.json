@@ -1,0 +1,8 @@
+{
+    "name": "avantcore/Zette",
+    "require": {
+        "php": ">=5.3.0",
+        "nette/nette": "2.0.*",
+        "zend/zendframework" : "1.11.*"
+    }
+}
